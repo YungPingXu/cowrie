@@ -143,6 +143,24 @@ guest_qemu_machine 的值有出現在此指令的執行結果就行
 
 用 ``bin/cowrie status`` 可以查看目前 stop 好了沒
 
+* 參考資料：
+
+https://cowrie.readthedocs.io/en/latest/INSTALL.html#installing-backend-pool-dependencies-optional
+
+https://cowrie.readthedocs.io/en/latest/BACKEND_POOL.html
+
+https://blog.d1tt0.net/posts/deploy_a_ssh_honeypot_with_cowrie/
+
+https://ithelp.ithome.com.tw/articles/10304345
+
+https://ithelp.ithome.com.tw/articles/10307721
+
+https://ithelp.ithome.com.tw/articles/10308120
+
+https://ithelp.ithome.com.tw/articles/10308491
+
+https://www.cnblogs.com/ABKing/p/14047223.html
+
 Welcome to the Cowrie GitHub repository
 *****************************************
 

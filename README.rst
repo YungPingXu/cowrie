@@ -141,7 +141,7 @@ guest_qemu_machine 的值有出現在此指令的執行結果就行
     different application entirely. To start a new one, either run it in some other
     directory, or use the --pidfile and --logfile parameters to avoid clashes.
 
-用 `bin/cowrie status` 可以查看目前 stop 好了沒
+用 ``bin/cowrie status`` 可以查看目前 stop 好了沒
 
 Welcome to the Cowrie GitHub repository
 *****************************************

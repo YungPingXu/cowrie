@@ -122,7 +122,7 @@ guest_qemu_machine 的值有出現在此指令的執行結果就行
 
 同時也會在 virtual machine manager 裡面看到
 
-![](https://i.imgur.com/fNw1hNg.png)
+.. image:: https://i.imgur.com/fNw1hNg.png
 
 都有了才能用 ssh 連::
 

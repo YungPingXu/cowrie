@@ -6,7 +6,7 @@ Fix Bugs
 
 用新版 python 的話，跑 proxy 模式會遇到 python 語法錯誤導致程式 crash
 
-![](https://i.imgur.com/OnvEQKA.png)
+.. image:: https://i.imgur.com/OnvEQKA.png
 
 因此修正了 ./src/backend_pool/pool_service.py 的程式碼
 

@@ -5,6 +5,7 @@ Fix Bugs
 *****************************************
 
 用新版 python 的話，跑 proxy 模式會遇到 python 語法錯誤導致程式 crash
+
 ![](https://i.imgur.com/OnvEQKA.png)
 
 因此修正了 ./src/backend_pool/pool_service.py 的程式碼
@@ -120,6 +121,7 @@ guest_qemu_machine 的值有出現在此指令的執行結果就行
     Guest 4 ready for connections @ 192.168.150.151! (boot 15s)
 
 同時也會在 virtual machine manager 裡面看到
+
 ![](https://i.imgur.com/fNw1hNg.png)
 
 都有了才能用 ssh 連::

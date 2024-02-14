@@ -264,7 +264,7 @@ class PoolService:
             used_guests = self.get_guest_states([POOL_STATE_USED])
             for guest in used_guests:
                 timed_out = (
-                    guest.freed_timestamp + guest_timeout < backend_pool.util.now()
+                    guest['freed_timestamp'] + guest_timeout < backend_pool.util.now()
                 )
 
                 # only mark guests without clients
@@ -274,10 +274,10 @@ class PoolService:
                     log.msg(
                         eventid="cowrie.backend_pool.service",
                         format="Guest %(guest_id)s (%(guest_ip)s) marked for deletion (timed-out)",
-                        guest_id=guest.id,
-                        guest_ip=guest.guest_ip,
+                        guest_id=guest['id'],
+                        guest_ip=guest['guest_ip'],
                     )
-                    guest.state = POOL_STATE_UNAVAILABLE
+                    guest['state'] = POOL_STATE_UNAVAILABLE
 
     def __producer_check_health(self) -> None:
         """
@@ -289,14 +289,14 @@ class PoolService:
                 [POOL_STATE_AVAILABLE, POOL_STATE_USING, POOL_STATE_USED]
             )
             for guest in usable_guests:
-                if not self.has_connectivity(guest.guest_ip):
+                if not self.has_connectivity(guest['guest_ip']):
                     log.msg(
                         eventid="cowrie.backend_pool.service",
                         format="Guest %(guest_id)s @ %(guest_ip)s has no connectivity... Destroying",
-                        guest_id=guest.id,
-                        guest_ip=guest.guest_ip,
+                        guest_id=guest['id'],
+                        guest_ip=guest['guest_ip'],
                     )
-                    guest.state = POOL_STATE_UNAVAILABLE
+                    guest['state'] = POOL_STATE_UNAVAILABLE
 
     def __producer_destroy_timed_out(self) -> None:
         """
@@ -305,8 +305,8 @@ class PoolService:
         unavailable_guests = self.get_guest_states([POOL_STATE_UNAVAILABLE])
         for guest in unavailable_guests:
             try:
-                self.qemu.destroy_guest(guest.domain, guest.snapshot)
-                guest.state = POOL_STATE_DESTROYED
+                self.qemu.destroy_guest(guest['domain'], guest['snapshot'])
+                guest['state'] = POOL_STATE_DESTROYED
             except Exception as error:
                 log.err(
                     eventid="cowrie.backend_pool.service",
@@ -332,15 +332,15 @@ class PoolService:
         """
         created_guests = self.get_guest_states([POOL_STATE_CREATED])
         for guest in created_guests:
-            if self.has_connectivity(guest.guest_ip):
+            if self.has_connectivity(guest['guest_ip']):
                 self.any_vm_up = True  # TODO fix for no VM available
-                guest.state = POOL_STATE_AVAILABLE
-                boot_time = int(time.time() - guest.start_timestamp)
+                guest['state'] = POOL_STATE_AVAILABLE
+                boot_time = int(time.time() - guest['start_timestamp'])
                 log.msg(
                     eventid="cowrie.backend_pool.service",
                     format="Guest %(guest_id)s ready for connections @ %(guest_ip)s! (boot %(boot_time)ss)",
-                    guest_id=guest.id,
-                    guest_ip=guest.guest_ip,
+                    guest_id=guest['id'],
+                    guest_ip=guest['guest_ip'],
                     boot_time=boot_time,
                 )
 
@@ -407,7 +407,7 @@ class PoolService:
             # if ip is the same, doesn't matter if being used or not
             usable_guests = self.get_guest_states([POOL_STATE_USED, POOL_STATE_USING])
             for guest in usable_guests:
-                if src_ip in guest.client_ips:
+                if src_ip in guest['client_ips']:
                     return guest
         return None
 
@@ -424,7 +424,7 @@ class PoolService:
         """
         with self.guest_lock:
             usable_guests = self.get_guest_states([POOL_STATE_USING, POOL_STATE_USED])
-            return min(usable_guests, key=lambda guest: guest.connected)
+            return min(usable_guests, key=lambda guest: guest['connected'])
 
     # Consumer methods to be called concurrently
     def request_vm(self, src_ip: str) -> tuple[int, str, str]:
@@ -447,32 +447,33 @@ class PoolService:
                 self.stop_pool()
             raise NoAvailableVMs()
 
-        guest.prev_state = guest.state
-        guest.state = POOL_STATE_USING
-        guest.connected += 1
-        guest.client_ips.append(src_ip)
+        guest['prev_state'] = guest['state']
+        guest['state'] = POOL_STATE_USING
+        guest['connected'] += 1
+        guest['client_ips'] = list(guest['client_ips']) # add
+        guest['client_ips'].append(src_ip)
 
-        return guest.id, guest.guest_ip, guest.snapshot
+        return guest['id'], guest['guest_ip'], guest['snapshot']
 
     def free_vm(self, guest_id: int) -> None:
         with self.guest_lock:
             for guest in self.guests:
-                if guest.id == guest_id:
-                    guest.freed_timestamp = backend_pool.util.now()
-                    guest.connected -= 1
+                if guest['id'] == guest_id:
+                    guest['freed_timestamp'] = backend_pool.util.now()
+                    guest['connected'] -= 1
 
-                    if guest.connected == 0:
-                        guest.state = POOL_STATE_USED
+                    if guest['connected'] == 0:
+                        guest['state'] = POOL_STATE_USED
                     return
 
     def reuse_vm(self, guest_id: int) -> None:
         with self.guest_lock:
             for guest in self.guests:
-                if guest.id == guest_id:
-                    guest.connected -= 1
+                if guest['id'] == guest_id:
+                    guest['connected'] -= 1
 
-                    if guest.connected == 0:
+                    if guest['connected'] == 0:
                         # revert machine state to previous
-                        guest.state = guest.prev_state
-                        guest.prev_state = None
+                        guest['state'] = guest['prev_state']
+                        guest['prev_state'] = None
                     return

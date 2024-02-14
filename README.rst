@@ -1,6 +1,145 @@
 Cowrie
 ######
 
+Fix Bugs
+*****************************************
+
+用新版 python 的話，跑 proxy 模式會遇到 python 語法錯誤導致程式 crash
+
+此 repo 修正了 ./src/backend_pool/pool_service.py 的程式碼
+
+執行環境：Ubuntu 22.04 主機 + python 3.10.12
+
+安裝必要套件::
+
+    sudo apt-get install git python3-virtualenv libssl-dev libffi-dev build-essential libpython3-dev python3-minimal authbind virtualenv
+    python3 -m venv cowrie-env
+    source cowrie-env/bin/activate
+
+然後會進到 (cowrie-env)::
+
+    python -m pip install --upgrade pip
+    python -m pip install --upgrade -r requirements.txt
+    bin/cowrie start
+
+接著用 ssh 連連看::
+
+    ssh root@localhost -p 2222
+
+如果出現以下錯誤::
+
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+    Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+    It is also possible that a host key has just been changed.
+    The fingerprint for the ED25519 key sent by the remote host is
+    Please contact your system administrator.
+    Add correct host key in /home/user/.ssh/known_hosts to get rid of this message.
+    Offending ED25519 key in /home/user/.ssh/known_hosts:7
+    remove with:
+    ssh-keygen -f "/home/user/.ssh/known_hosts" -R "[localhost]:2222"
+    Host key for [localhost]:2222 has changed and you have requested strict checking.
+    Host key verification failed.
+
+就按照它說的用上面的命令刪除 ssh key 即可::
+
+    ssh-keygen -f "/home/[your_username].ssh/known_hosts" -R "[localhost]:2222"
+
+./etc/userdb.txt 裡面已添加了帳密::
+
+    root:x:asd1234
+    citrus:x:1234
+
+必須要用裡面的帳密組合(可自行修改)才可成功登入，而不是像原本預設的帳密亂打也能進來
+
+Proxy 模式 (Backend Pool)
+*****************************************
+
+安裝必要套件::
+
+    sudo apt-get install qemu qemu-system-arm qemu-system-x86 libvirt-dev libvirt-daemon libvirt-daemon-system libvirt-clients nmap
+
+讓使用者可以執行 libvirt::
+
+    sudo usermod -aG libvirt [your_username]
+
+建立資料夾::
+
+    mkdir cowrie-imgs
+
+下載官方提供的 image - ubuntu18.04-minimal.qcow2
+
+https://drive.google.com/open?id=1ZNE57lzaGWR427XxynqUVJ_2anTKmFmh
+
+放到 ./cowrie-imgs 資料夾
+
+安裝 virtinst 以及 virtual machine manager::
+
+    sudo apt install virtinst virt-manager
+
+修改 cowrie.cfg.dist 配置，改為 proxy 模式
+
+將 guest_image_path 設為剛才下載的 image 路徑
+
+以及由於預設的 kvm 不能用，因此將 guest_hypervisor 改為 qemu::
+
+    [honeypot]
+    backend = proxy
+    [backend_pool]
+    guest_image_path = /home/[your_username]/Desktop/cowrie/cowrie-imgs/ubuntu18.04-minimal.qcow2
+    guest_hypervisor = qemu
+    guest_qemu_machine = pc-q35-bionic
+
+guest_qemu_machine 的部份可下指令查詢可支援的環境::
+
+    qemu-system-x86_64 -machine help
+
+guest_qemu_machine 的值有出現在此指令的執行結果就行
+
+裝 backend 虛擬機的部份只需要這樣就行，因為它會直接讀 guest_image_path，不用再自己手動安裝
+
+接下來重啟 cowrie::
+
+    bin/cowrie restart
+
+接著它會開始建立 backend 虛擬機，需稍等 1~2 分鐘
+
+查看日誌檔最後面 100 行的紀錄::
+
+    tail ./var/log/cowrie/cowrie.log -n 100
+
+要有出現以下這些才是成功::
+
+    Guest 0 ready for connections @ 192.168.150.43! (boot 16s)
+    Guest 1 ready for connections @ 192.168.150.72! (boot 16s)
+    Guest 2 ready for connections @ 192.168.150.221! (boot 16s)
+    Guest 3 ready for connections @ 192.168.150.119! (boot 15s)
+    Guest 4 ready for connections @ 192.168.150.151! (boot 15s)
+
+同時也會在 virtual machine manager 裡面看到
+![](ttps://i.imgur.com/fNw1hNg.png)
+
+都有了才能用 ssh 連::
+
+    ssh root@localhost -p 2222
+
+之後在 proxy 模式下，重啟都用 stop 和 start，別用 restart
+
+而且每次 stop 完要先稍等一下再 start
+
+因為它還要砍掉虛擬機，所以會比較慢
+
+不然會出現以下錯誤::
+
+    Another twistd server is running, PID 17478
+    This could either be a previously started instance of your application or a
+    different application entirely. To start a new one, either run it in some other
+    directory, or use the --pidfile and --logfile parameters to avoid clashes.
+
+用 bin/cowrie status 可以查看目前 stop 好了沒
+
 Welcome to the Cowrie GitHub repository
 *****************************************
 

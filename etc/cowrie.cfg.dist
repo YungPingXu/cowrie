@@ -105,13 +105,14 @@ ttylog_path = ${honeypot:state_path}/tty
 interactive_timeout = 180
 
 # Authentication Timeout
-# The server disconnects after this time if the user has not successfully logged in. 
+# The server disconnects after this time if the user has not successfully logged in.
 # The default is 120 seconds.
 authentication_timeout = 120
 
 # EXPERIMENTAL: back-end to user for Cowrie, options: proxy or shell
 # (default: shell)
 backend = shell
+# backend = proxy
 
 # Timezone Cowrie uses for logging
 # This can be any valid timezone for the TZ environment variable
@@ -242,8 +243,9 @@ guest_telnet_port = 23
 # Advanced: guest_qemu_machine defines which machine Qemu emulates for your VM
 # If you get a "unsupported machine type" exception when VMs are loading, change
 # it to a compatible machine listed by the command: 'qemu-system-x86_64 -machine help'
-guest_image_path = /home/cowrie/cowrie-imgs/ubuntu18.04-minimal.qcow2
-guest_hypervisor = kvm
+guest_image_path = /home/user/Desktop/cowrie/cowrie-imgs/ubuntu18.04-minimal.qcow2
+guest_hypervisor = qemu
+# guest_hypervisor = kvm
 guest_memory = 512
 guest_qemu_machine = pc-q35-bionic
 
@@ -1011,7 +1013,7 @@ debug = false
 # 1. Create a bot following https://core.telegram.org/bots#6-botfather to get token.
 # 2. Send message to your bot, then use https://api.telegram.org/bot{bot_token}/getUpdates to find chat_id.
 # N.b. bot will only send messages on cowrie.login.success, cowrie.command.input/.failed, and
-# cowrie.session.file_download, to prevent spam. 
+# cowrie.session.file_download, to prevent spam.
 [output_telegram]
 enabled = false
 bot_token = 123456789:AbCDEfGhiJkLmnOpQRstUVWxYZ

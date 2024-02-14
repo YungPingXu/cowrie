@@ -1,4 +1,4 @@
-cowrie.cfg
+# cowrie.cfg
 cowrie.pid
 etc/ssh_host_dsa_key
 etc/ssh_host_dsa_key.pub
@@ -26,3 +26,7 @@ _trial_temp
 .pydevproject
 .idea/
 .tox
+# add:
+cowrie-imgs
+*.qcow2
+*.iso

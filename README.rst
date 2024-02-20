@@ -67,6 +67,25 @@ Proxy 模式 (Backend Pool)
 
     sudo usermod -aG libvirt [your_username]
 
+並且為了要讓 QEMU 可以使用 disk image 和 snapshot
+
+用下列指令更改 qemu.conf 的設定 (用 vim 也可以)::
+
+    sudo nano /etc/libvirt/qemu.conf
+
+修改 user 和 group 的值::
+
+    user = [your_username]
+    group = [your_username]
+
+接著重啟 libvirt::
+
+    sudo systemctl restart libvirtd.service
+
+上述 qemu.conf 的部分如果沒做修改的話可能會遇到以下錯誤
+
+.. image:: https://i.imgur.com/YMRz40F.png
+
 建立資料夾::
 
     mkdir cowrie-imgs
@@ -177,6 +196,9 @@ https://ithelp.ithome.com.tw/articles/10308491
 【cowrie蜜罐系列2】cowrie蜜罐配置代理成為高交互蜜罐（避免踩坑）
 
 https://www.cnblogs.com/ABKing/p/14047223.html
+
+kvm 权限报错- cannot access storage file (as uid:107, gid:107) permission denied
+https://blog.csdn.net/yuezhilangniao/article/details/113743688
 
 Welcome to the Cowrie GitHub repository
 *****************************************

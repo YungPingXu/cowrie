@@ -20,8 +20,8 @@ Fix Bugs
 
 然後會進到 (cowrie-env)::
 
-    python -m pip install --upgrade pip
-    python -m pip install --upgrade -r requirements.txt
+    python3 -m pip install --upgrade pip
+    pip3 install -r requirements.txt
     bin/cowrie start
 
 接著用 ssh 連連看::
@@ -47,7 +47,7 @@ Fix Bugs
 
 就按照它說的用上面的命令刪除 ssh key 即可::
 
-    ssh-keygen -f "/home/[your_username].ssh/known_hosts" -R "[localhost]:2222"
+    ssh-keygen -f "/home/your_username.ssh/known_hosts" -R "[localhost]:2222"
 
 ./etc/userdb.txt 裡面已添加了帳密::
 
@@ -61,7 +61,7 @@ Proxy 模式 (Backend Pool)
 
 讓使用者可以執行 libvirt::
 
-    sudo usermod -aG libvirt [your_username]
+    sudo usermod -aG libvirt your_username
 
 並且為了要讓 QEMU 可以使用 disk image 和 snapshot
 
@@ -71,8 +71,8 @@ Proxy 模式 (Backend Pool)
 
 修改 user 和 group 的值::
 
-    user = "root"
-    group = "root"
+    user = "your_username"
+    group = "your_username"
 
 接著重啟 libvirt::
 
@@ -107,7 +107,7 @@ https://drive.google.com/drive/folders/1-bvEYMDO6voa6Y8tA42w9kjobpuzQIB6?usp=dri
     [honeypot]
     backend = proxy
     [backend_pool]
-    guest_image_path = /home/[your_username]/Desktop/cowrie/cowrie-imgs/ubuntu18.04-minimal.qcow2
+    guest_image_path = /home/your_username/Desktop/cowrie/cowrie-imgs/ubuntu18.04-minimal.qcow2
     guest_hypervisor = qemu
     guest_qemu_machine = pc-q35-bionic
 
@@ -118,6 +118,10 @@ guest_qemu_machine 的部份可下指令查詢可支援的環境::
 guest_qemu_machine 的值有出現在此指令的執行結果就行
 
 裝 backend 虛擬機的部份只需要這樣就行，因為它會直接讀 guest_image_path，不用再自己手動安裝
+
+更改權限::
+    
+    sudo chmod 777 /var/run/libvirt/libvirt-sock
 
 接下來重啟 cowrie::
 
@@ -165,7 +169,7 @@ guest_qemu_machine 的值有出現在此指令的執行結果就行
 可以修改 ./etc/cowrie.cfg.dist 裡的設定，減少建立的虛擬機個數::
 
     [proxy]
-    pool_max_vms = [虛擬機個數]
+    pool_max_vms = 虛擬機個數
 
 參考資料
 *****************************************

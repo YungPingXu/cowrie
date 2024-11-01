@@ -111,8 +111,8 @@ authentication_timeout = 120
 
 # EXPERIMENTAL: back-end to user for Cowrie, options: proxy or shell
 # (default: shell)
-#backend = shell
-backend = proxy
+backend = shell
+#backend = proxy
 
 # Timezone Cowrie uses for logging
 # This can be any valid timezone for the TZ environment variable

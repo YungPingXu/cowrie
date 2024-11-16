@@ -22,5 +22,7 @@
 # *:x:somepassword
 # *:x:*
 # add:
-root:x:asd1234
+root:x:1234
+root:x:asd
 user:x:1234
+user:x:asd

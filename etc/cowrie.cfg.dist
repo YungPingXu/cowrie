@@ -246,7 +246,7 @@ guest_telnet_port = 23
 guest_image_path = /home/user/Desktop/cowrie/cowrie-imgs/ubuntu18.04-minimal.qcow2
 guest_hypervisor = qemu
 # guest_hypervisor = kvm
-guest_memory = 512
+guest_memory = 2048
 guest_qemu_machine = pc-q35-bionic
 
 # =====================================
